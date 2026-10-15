@@ -1,0 +1,11 @@
+{
+    "Set ROI Image" : "561",
+    "Measure ROI Image" : {
+        "DAT" : "561",
+        "TH" : "488"
+    },
+    "ROI Names" : [
+        "Background",
+        "Striatum"
+    ]
+}
