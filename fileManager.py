@@ -55,7 +55,6 @@ def get_roi_folder(image_path):
 def save_results(config,results):
     # Update acquired results (append excel sheet and update config)
     master_dir = os.path.dirname(os.path.dirname(os.path.dirname(config.path))) # Master directory is three levels above the current image
-    IJ.log(master_dir)
 
     for stain in config.roi_measure:
         # Loop through each stain being measured
@@ -83,14 +82,13 @@ def save_results(config,results):
         with io.open(csv_path,'wb') as file:
             # Open the file (and wipe it clean) for writing
             writer = csv.writer(file) # Generate a csv writer object of the file
-            IJ.log(str(data))
             writer.writerows(data) # Write the updated csv
 
 def generate_csv_rows (data,results):
     # Method to append rows to the csv variable and change the header row if neccessary given the current csv data and results
     change_header = False # Initialize flag as false
     metrics = data[0][3:] # Isolate the listed metrics of the first row, skipping the first three columns
-    IJ.log(str(metrics))
+
     for image in results['Measurements']:
         # Loop through each image that was analyzed
         for roi in results['Measurements'][image]['ROIs']:
@@ -108,7 +106,6 @@ def generate_csv_rows (data,results):
                 # Loop through each metric in the roi_measurements
                 if not metric in metrics:
                     # If this metric is not listed in the csv file
-                    IJ.log(metric + " was added as a header since it was not in: " + str(metrics))
                     metrics.append(metric) # Add the metric to the list of metrics
                     row.append(roi_measurements[metric]) # Add the measurement to the row
                     change_header = True # Mark flag
@@ -122,8 +119,6 @@ def transition_path(config,script_dir):
     # Method that transitions the path to the next image in the image folder and updates the config and the file path text file
 
     current_image_dir = os.path.dirname(config.path) # Define the current image folder
-    IJ.log("Default directory: " + current_image_dir)
-    IJ.log("Reap directory: "+File(current_image_dir).getCanonicalPath())
     current_image_dir_name = os.path.basename(File(current_image_dir).getCanonicalPath()) # Define the name of the directory.
     # NOTE: I used File object from java.io since it was the only method I could find in Jython to get a conincal path without shortcuts, which is necessary for long paths
     master_image_dir = os.path.dirname(current_image_dir) # Folder of all images is one layer above any given image folder
@@ -132,7 +127,7 @@ def transition_path(config,script_dir):
         current_index = list_of_image_dirs.index(current_image_dir_name) # Pull the index of the current image folder in its directory
     except:
         # If the index of the current folder can't be found
-        IJ.log("The next image folder cannot be located.") # Inform the user
+        IJ.log("The current image folder cannot be located, so automatic transition to next image folder is unavailable.") # Inform the user
         return True
     
     try:
@@ -145,11 +140,21 @@ def transition_path(config,script_dir):
             if os.path.isdir(next_image_dir):
                 # If the next item in the directory is a directory
                 break
+
+            current_index += 1 # Increment the index
+
     except:
         # If you loop through all of the folder's contents
+        IJ.log("There are no more eligible folders to search for.")
         return True
 
     next_image_path = find_in_directory(next_image_dir,config.roi_set) # Find the next image to draw ROIs onto, inputting the directory and identifier of the image
+    
+    if next_image_path is None:
+        # If an eligible image cannot be found
+        IJ.log("An image with the identifier: "+config.roi_set+" could not be found in: "+next_image_dir)
+        return True
+    
     config.path = next_image_path # Update the config
         
     #Next, update the file path text file

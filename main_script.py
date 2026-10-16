@@ -40,8 +40,7 @@ def run_script():
     # Next, check whether an appropriate number of roi's are open
     if not imageJInterfacer.check_rois(config.roi_name):
         # If inapplicable roi's are open
-        IJ.log("Error: rois are not created or the number of rois listed in the roi manager does not match the number of rois listed in the config file.") # Inform the user
-        return
+        return # End the script
 
     # If rois look fine, run the analysis
     results = imageJInterfacer.run_analysis(config) # Begin the analysis
@@ -61,8 +60,7 @@ def run_script():
     if config.next_image:
         # Next, if the user wants to automatically open the next image, update the config's path to the next image
         if fileManager.transition_path(config,current_dir):
-            # If the end of the image folder has been reached
-            IJ.log("The next image folder could not be located.") # Inform the user
+            # If the end of the image folder has been reached or the current folder could not be found or an eligible image could not be found in the next folder
             return # End the script
     
     # Finally, open the logged image (either the current or next image based on the user's input)
@@ -73,5 +71,5 @@ def run_script():
     imageJInterfacer.close_window("Console") # Close the console window
 
 if __name__ == "__main__":
-    # If this file is being caleld directly
+    # If this file is being called directly
     run_script() # Run the script

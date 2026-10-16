@@ -6,6 +6,7 @@ from ij.measure import ResultsTable
 from ij.io import OpenDialog
 import fileManager
 import os
+from java.awt import Frame
 
 def check_open_image():
     # Function that checks whether an image is open in ImageJ and returns a condition and path if so
@@ -14,7 +15,6 @@ def check_open_image():
         image_name = OpenDialog.getLastName() # Gets the name of the last image opened
         image_dir = OpenDialog.getLastDirectory() # Gets the directory of the last image opened
         image_path = image_dir + image_name # Generate the path from the directory and file name
-        IJ.log(image_path)
         return [True,image_path] # Return that an image is open and its path
     except:
         # If no image is opened
@@ -37,11 +37,17 @@ def check_rois(rois):
         config_num_rois = len(rois) # Number of ROIs listed in the config
         rm = RoiManager.getInstance() # Get the current instance of the ROI manager
         rm_num_rois = rm.getCount() # Returns the number of ROIs listed in the ROI manager
-        IJ.log("Number in manager = " + str(rm_num_rois))
-        IJ.log("Number in config = " + str(config_num_rois))
-        return (config_num_rois == rm_num_rois) # Return whether the number of ROIs match
+        if config_num_rois == rm_num_rois:
+            # If the ROIs match
+            return True
+        else:
+            IJ.log("Number of ROIs in config and in the ROI manager do not match.")
+            IJ.log("Number of ROIs in config = "+(config_num_rois))
+            IJ.log("Number of ROIs in manager = " + str(rm_num_rois))
+            return False
     except AttributeError:
-        # If the ROI manager is not openeded
+        # If the ROI manager is not opened
+        IJ.log("ROI manager is not opened.")
         return False
 
 def run_analysis(config):
@@ -59,16 +65,23 @@ def run_analysis(config):
     for stain in config.roi_measure:
         # Loop through each modality image that needs to be measured
         measure_image_identifier = config.roi_measure[stain] # Identifier of the image to be opened
-        IJ.log(measure_image_identifier)
         new_path = fileManager.find_in_directory(os.path.dirname(config.path),measure_image_identifier) # Return the path of the desired image
+        
         if new_path is None:
             # If an image could not be found
             IJ.log("An image could not be found in the directory: " + os.path.dirname(config.path) + " with the appropriate identifier: " + measure_image_identifier) # Inform the user
             return None
-        image = IJ.openImage(new_path) # Open the image
-        image.show() # Show the current image so that IJ operations will be performed on it
+
         image_name = os.path.basename(new_path) # Get the name of the file
-        IJ.log(image_name)
+
+        try:
+            image = IJ.openImage(new_path) # Open the image
+            image.show() # Show the current image so that IJ operations will be performed on it
+        except:
+            # If the image could not be opened
+            IJ.log(image_name+" could not be opened.")
+            return
+
         IJ.run(image,"8-bit","") # Convert the image to 8-bit
 
         results['Measurements'][image_name] = { # Initialize dictionary for the current image
@@ -92,9 +105,8 @@ def run_analysis(config):
     results_window = WindowManager.getWindow("Results") # Load the results window
     results_window.setVisible(False)  # Hide it instantly
     # NOTE: I chose to hide the results window instead of closing it so that ImageJ does not prompt the user to save their results
-    
+
     IJ.run("Close All") # Close all images
-    IJ.log(str(results))
     return results # Return the results of the analysis
 
 def save_rois (path,roi_names,image_name):
@@ -113,8 +125,11 @@ def save_rois (path,roi_names,image_name):
 
 def close_window(name):
     # Function to close a window in ImageJ given its name
-    window = WindowManager.getWindow(name) # Load an object of the window
 
-    if window is not None:
-        # If the window is open
-        window.close() # Close the window
+    for frame in Frame.getFrames():
+        # Get all actively open frames (windows) and loop through the
+        if frame.getTitle() == name:
+            # If the desired frame is in the list of open frames
+            frame.dispose() # Dispose of it
+            IJ.log(name+" was disposed.")
+    # NOTE: I used the Frame class because ImageJ's WindowManager class does not include the Console window
