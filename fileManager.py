@@ -17,6 +17,7 @@ class Config:
         self.roi_set = config["Set ROI Image"] # Define image to base rois on
         self.roi_measure = config["Measure ROI Image"] # Define images to measure with rois
         self.roi_name = config["ROI Names"] # Define the names of the rois
+        self.next_image = config['Open Next Image'] # Define whether or not the user wants to open the next image
         self.path = path # Pull the listed file path
 
 def load_config(plugin_path):
@@ -157,6 +158,3 @@ def transition_path(config,script_dir):
 
     # Reutrn that there is more content in the folder
     return False
-
-
-# HOW DO I FIND FOLDERS AND FILES THAT ARE ABBREVIATED DUE TO LONG FILE NAMES??

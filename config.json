@@ -7,5 +7,6 @@
     "ROI Names" : [
         "Background",
         "Striatum"
-    ]
+    ],
+    "Open Next Image" : true
 }

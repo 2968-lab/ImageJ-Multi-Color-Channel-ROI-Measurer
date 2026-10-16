@@ -91,12 +91,14 @@ def run_analysis(config):
 
     results_window = WindowManager.getWindow("Results") # Load the results window
     results_window.setVisible(False)  # Hide it instantly
+    # NOTE: I chose to hide the results window instead of closing it so that ImageJ does not prompt the user to save their results
+    
     IJ.run("Close All") # Close all images
     IJ.log(str(results))
     return results # Return the results of the analysis
 
 def save_rois (path,roi_names,image_name):
-    # Method that saves the open ROIs in ImageJ to the inputted path as the inputted name, renaming the individual rois to their names
+    # Function that saves the open ROIs in ImageJ to the inputted path as the inputted name, renaming the individual rois to their names
     roi_manager = RoiManager.getInstance() # Load the ROI manager
     
     for i,name in enumerate(roi_names):
@@ -108,3 +110,11 @@ def save_rois (path,roi_names,image_name):
     roi_manager.runCommand("Save",full_path) # Save the ROIs to this path
 
     roi_manager.reset() # Clears the ROIs from the manager
+
+def close_window(name):
+    # Function to close a window in ImageJ given its name
+    window = WindowManager.getWindow(name) # Load an object of the window
+
+    if window is not None:
+        # If the window is open
+        window.close() # Close the window

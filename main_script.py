@@ -58,14 +58,19 @@ def run_script():
     image_name = os.path.basename(File(os.path.dirname(config.path)).getCanonicalPath()) # Get the cononical name of the image folder
     imageJInterfacer.save_rois(roi_path,config.roi_name,image_name) # Save the open ROIs to the ROI directory under the name of the image folder 
 
-    # Next, update the config's path to the next image
-    if fileManager.transition_path(config,current_dir):
-        # If the end of the image folder has been reached
-        IJ.log("The next image folder could not be located.") # Inform the user
-        return # End the script
+    if config.next_image:
+        # Next, if the user wants to automatically open the next image, update the config's path to the next image
+        if fileManager.transition_path(config,current_dir):
+            # If the end of the image folder has been reached
+            IJ.log("The next image folder could not be located.") # Inform the user
+            return # End the script
     
-    # Finally, open the next image
+    # Finally, open the logged image (either the current or next image based on the user's input)
     imageJInterfacer.open_image(config.path)
+
+    # Sometimes a threading error can pop up in the console even if everything exectued correctly.
+    # If this point in the script is executing, then no error occured, and the console window can be closed.
+    imageJInterfacer.close_window("Console") # Close the console window
 
 if __name__ == "__main__":
     # If this file is being caleld directly
