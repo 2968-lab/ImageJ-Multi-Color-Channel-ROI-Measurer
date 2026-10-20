@@ -18,7 +18,7 @@ def check_open_image():
         return [True,image_path] # Return that an image is open and its path
     except:
         # If no image is opened
-        return [False, ""] # Return that no image iopen and a blank path
+        return [False, ""] # Return that no image is open and a blank path
 
 def open_image(path):
     # Function to open an image given a path to the image
@@ -32,7 +32,7 @@ def open_image(path):
 
 
 def check_rois(rois):
-    # Function that checks whether the correct number of ROIs are opened when compared with a list of inputted names for these rois. Returns true if number of ROIs is correct
+    # Function that checks whether the correct number of ROIs are opened when compared with a list of inputted names for these ROIs. Returns true if number of ROIs are correct
     try:
         config_num_rois = len(rois) # Number of ROIs listed in the config
         rm = RoiManager.getInstance() # Get the current instance of the ROI manager
@@ -42,7 +42,7 @@ def check_rois(rois):
             return True
         else:
             IJ.log("Number of ROIs in config and in the ROI manager do not match.")
-            IJ.log("Number of ROIs in config = "+(config_num_rois))
+            IJ.log("Number of ROIs in config = "+ str(config_num_rois))
             IJ.log("Number of ROIs in manager = " + str(rm_num_rois))
             return False
     except AttributeError:
@@ -52,9 +52,9 @@ def check_rois(rois):
 
 def run_analysis(config):
     # Function that runs the ImageJ analysis given an inputted config.
-    # By this point, an image is gaurenteed to be open and the correct number of ROIs are present
+    # By this point, an image is guaranteed to be open and the correct number of ROIs are present
 
-    results = { # Initialize dicitonary of results
+    results = { # Initialize dictionary of results
         "Image Folder" : os.path.basename(os.path.dirname(config.path)), # Save the name of the image folder
         "Measurements" : {} # Initialize empty dictionary of measurements
     } 
@@ -95,7 +95,7 @@ def run_analysis(config):
             roi = roi_manager.getRoi(i) # Load the current number ROI from the manager
             image.setRoi(roi) # Sets the current ROI onto the image
             IJ.run("Measure") # Measure the current roi on the current image
-            results['Measurements'][image_name]['ROIs'][roi_name] = {} # Create an empty dictionary for the current roi of the current image
+            results['Measurements'][image_name]['ROIs'][roi_name] = {} # Create an empty dictionary for the current ROI of the current image
             roi_shortcut = results['Measurements'][image_name]['ROIs'][roi_name] # Create a shortcut
     
             for heading in results_table.getHeadings():
@@ -110,7 +110,7 @@ def run_analysis(config):
     return results # Return the results of the analysis
 
 def save_rois (path,roi_names,image_name):
-    # Function that saves the open ROIs in ImageJ to the inputted path as the inputted name, renaming the individual rois to their names
+    # Function that saves the open ROIs in ImageJ to the inputted path as the inputted name, renaming the individual ROIs to their names
     roi_manager = RoiManager.getInstance() # Load the ROI manager
     
     for i,name in enumerate(roi_names):
@@ -131,5 +131,4 @@ def close_window(name):
         if frame.getTitle() == name:
             # If the desired frame is in the list of open frames
             frame.dispose() # Dispose of it
-            IJ.log(name+" was disposed.")
     # NOTE: I used the Frame class because ImageJ's WindowManager class does not include the Console window

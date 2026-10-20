@@ -3,7 +3,7 @@ This repository functions as a plugin for ImageJ to expedite the analysis of reg
 
 # How to Use this Repository
 ## Requirements
-This repository requires the Fiji package of ImageJ.
+This repository requires the Fiji package of ImageJ as it runs in the Python to Java (Jython) environment provided by Fiji.
 
 ## Image Folder Structure
 The following is the file structure required for this plugin:
@@ -25,8 +25,8 @@ ImageJ Analysis Project/
     │   ├── Image2_Name_561.tiff
     │   └── Image2_Name_488.tiff
     ├── Image3_Name/
-    │   ├── Image2_Name_561.tiff
-    │   └── Image2_Name_488.tiff
+    │   ├── Image3_Name_561.tiff
+    │   └── Image3_Name_488.tiff
     ...
 ```
 
@@ -44,14 +44,14 @@ Below is a description of the meaning of each field of the config file to be alt
 Finally, "Open Next Image" indicates whether or not you want the program to attempt to search for the next image folder to open. true indicates that the program will attempt to open the next image, and false indicates that it will not. Please note that if you input false, then the "Set ROI Image" field is redundant and can be left blank.
 
 ## Running the Plugin
-To use the plugin, clone this repository into the plugin folder for Fiji/ImageJ, wherever it is installed. Once this repository has been added into the plugin folder and the config has been updated, you can find and run the plugin in ImageJ's GUI's "Plugins" button, listed as "main script." Alternatevly, you can set the plugin to run on a keybind by selecting "Plugins" -> "Shortcuts" -> "Add Shortcut by Name..." and typing "main scipt" into the command field.
+To use the plugin, clone this repository into the plugin folder for Fiji/ImageJ, wherever it is installed. Once this repository has been added into the plugin folder and the config has been updated, you can find and run the plugin in ImageJ's GUI's "Plugins" button, listed as "main script." Alternatively, you can set the plugin to run on a key bind by selecting "Plugins" -> "Shortcuts" -> "Add Shortcut by Name..." and typing "main script" into the command field.
 
-The first time you run the pluggin, you will need to manually open the first image in ImageJ. After the pluggin has been ran successfully at least once, the path to the last measured image will be saved in a .txt file if "Open Next Image" is false. If true, and the next image could be found, the path to the next image will be saved. At that point, whenever you run the plugin and an image is not open in ImageJ, the saved image will automatically be opened.
+The first time you run the plugin, you will need to manually open the first image in ImageJ. After the plugin has been ran successfully at least once, the path to the last measured image will be saved in a .txt file if "Open Next Image" is false. If true, and the next image could be found, the path to the next image will be saved. At that point, whenever you run the plugin and an image is not open in ImageJ, the saved image will automatically be opened.
 
 # How this Plugin Works
 When an image is open and ROIs are drawn on the image, this plugin will search for and open the images with identifiers listed under "Measure ROI Image" in the config within the same folder as the currently opened image. Once the images are found, they are converted to grey scale, and the ROIs open in the ROI Manager are measured on these images. Note that the what metrics are measured depends on the settings listed in "Analyze" -> "Set Measurements..." in the ImageJ GUI. These results are then saved to .csv files (one for each entry in "Measure ROI Image") in the parent folder. The ROIs are also saved. The plugin will end by closing excess windows, clearing the ROI Manager, and opening the next image (if "Open Next Image" is true).
 
 # Limitations
-The biggest limitation is that this plugin is contingent on the file structure. Please note that while this plugin may be funcitonal without this file structure if you set "Open Next Image" to false, it is not gaurenteed to work, and the ouput files will always be two folder levels above wherever the image is.
+The biggest limitation is that this plugin is contingent on the file structure. Please note that while this plugin may be functional without this file structure if you set "Open Next Image" to false, it is not guaranteed to work, and the output files will always be two folder levels above wherever the image is.
 
-One key limitation of this plugin is that the .csv files are rewritten with each measurement. This means that the files cannot be loaded in excel while the pluggin is working. If this occurs, you may need to reset ImageJ before the pluggin will continue to work. It is recommended to copy and/or rename the resutls .csv files before making any alterations to these files or after your measuring is complete.
+One key limitation of this plugin is that the .csv files are rewritten with each measurement. This means that the files cannot be loaded in excel while the plugin is working. If this occurs, you may need to reset ImageJ before the plugin will continue to work. It is recommended to copy and/or rename the results.csv files before making any alterations to these files or after your measuring is complete.

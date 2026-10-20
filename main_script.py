@@ -13,14 +13,15 @@ if current_dir not in sys.path:
     # If this directory is not in the system paths (that would be searched for modules)
     sys.path.insert(0, current_dir) # Add it and set it as the first one (highest priority)
 
-import imageJInterfacer # Import functions from the imagej interfacer script
+import imageJInterfacer # Import functions from the imageJInterfacer script
 import fileManager # Import functions from the file manager
-
-# First, import configurations from config
-config = fileManager.load_config(current_dir)
 
 def run_script():
     # The script is wrapped in a function so that it can be easily exited if any information is missing or inaccurate
+
+    # First, import configurations from config
+    config = fileManager.load_config(current_dir)
+
     # Next, check whether an image is open or can be opened
     [is_image_open,path_to_image] = imageJInterfacer.check_open_image()
     if is_image_open:
@@ -33,28 +34,28 @@ def run_script():
             # If a path is listed in the config
             opened = imageJInterfacer.open_image(config.path) # Open the image
         if not opened:
-            # If the image is not opened
-            IJ.log("Error: No image open and no valid path recorded. Please open an image or fill in the file path.") # Inform the user
-            return
+            # If ImageJ failed to open the image
+            IJ.log("Error: No image open and no valid path recorded. Please open an image.") # Inform the user
+            return # End the script
 
-    # Next, check whether an appropriate number of roi's are open
+    # Next, check whether an appropriate number of ROIs are open
     if not imageJInterfacer.check_rois(config.roi_name):
-        # If inapplicable roi's are open
+        # If inapplicable ROIs are open
         return # End the script
 
-    # If rois look fine, run the analysis
+    # If ROIs look fine, run the analysis
     results = imageJInterfacer.run_analysis(config) # Begin the analysis
 
     if results is None:
-        # If the analysis failed, stop
-        return
+        # If the analysis failed
+        return # End the script
 
     # Next, save the results and update config
     fileManager.save_results(config,results)
 
     # Once analysis is complete, save the ROIs
-    roi_path = fileManager.get_roi_folder(config.path)
-    image_name = os.path.basename(File(os.path.dirname(config.path)).getCanonicalPath()) # Get the cononical name of the image folder
+    roi_path = fileManager.get_roi_folder(config.path) # Get or create folder containing ROIs
+    image_name = os.path.basename(File(os.path.dirname(config.path)).getCanonicalPath()) # Get the canonical name of the image folder
     imageJInterfacer.save_rois(roi_path,config.roi_name,image_name) # Save the open ROIs to the ROI directory under the name of the image folder 
 
     if config.next_image:
@@ -66,8 +67,8 @@ def run_script():
     # Finally, open the logged image (either the current or next image based on the user's input)
     imageJInterfacer.open_image(config.path)
 
-    # Sometimes a threading error can pop up in the console even if everything exectued correctly.
-    # If this point in the script is executing, then no error occured, and the console window can be closed.
+    # Sometimes a threading error can pop up in the console even if everything executed correctly.
+    # If this point in the script is executing, then no error occurred, and the console window can be closed.
     imageJInterfacer.close_window("Console") # Close the console window
 
 if __name__ == "__main__":

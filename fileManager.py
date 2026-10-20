@@ -14,9 +14,9 @@ class Config:
     def __init__ (self,config,path):
         # Input the config dictionary
         self.original = config # Save the original file structure
-        self.roi_set = config["Set ROI Image"] # Define image to base rois on
-        self.roi_measure = config["Measure ROI Image"] # Define images to measure with rois
-        self.roi_name = config["ROI Names"] # Define the names of the rois
+        self.roi_set = config["Set ROI Image"] # Define image to base ROIs on
+        self.roi_measure = config["Measure ROI Image"] # Define images to measure with ROIs
+        self.roi_name = config["ROI Names"] # Define the names of the ROIs
         self.next_image = config['Open Next Image'] # Define whether or not the user wants to open the next image
         self.path = path # Pull the listed file path
 
@@ -33,7 +33,7 @@ def load_config(plugin_path):
     return Config(json_config,path) # Return the config converted into an object
 
 def find_in_directory(directory,identifier):
-    # Funciton that searches the current directory and returns a path to the file matching the inputted string identifier
+    # Function that searches the current directory and returns a path to the file matching the inputted string identifier
     # Where config.path is a path object of a file in the desired directory to be searched
     for file in os.listdir(directory):
         # Loop through each file in the directory, where file is the file name only
@@ -85,7 +85,7 @@ def save_results(config,results):
             writer.writerows(data) # Write the updated csv
 
 def generate_csv_rows (data,results):
-    # Method to append rows to the csv variable and change the header row if neccessary given the current csv data and results
+    # Method to append rows to the csv variable and change the header row if necessary given the current csv data and results
     change_header = False # Initialize flag as false
     metrics = data[0][3:] # Isolate the listed metrics of the first row, skipping the first three columns
 
@@ -93,7 +93,7 @@ def generate_csv_rows (data,results):
         # Loop through each image that was analyzed
         for roi in results['Measurements'][image]['ROIs']:
             # Loop through each measured ROI
-            row = [image,results['Measurements'][image]['Stain'],roi] # Record the image name, stain, and roi as the first three columns
+            row = [image,results['Measurements'][image]['Stain'],roi] # Record the image name, stain, and ROI as the first three columns
             roi_measurements = results['Measurements'][image]['ROIs'][roi] # Create shortcut in the dictionary
             for metric in metrics:
                 # Loop through each metric included in the header of the csv
@@ -120,9 +120,10 @@ def transition_path(config,script_dir):
 
     current_image_dir = os.path.dirname(config.path) # Define the current image folder
     current_image_dir_name = os.path.basename(File(current_image_dir).getCanonicalPath()) # Define the name of the directory.
-    # NOTE: I used File object from java.io since it was the only method I could find in Jython to get a conincal path without shortcuts, which is necessary for long paths
+    # NOTE: I used File object from java.io since it was the only method I could find in Jython to get a canonical path without shortcuts, which is necessary for long paths
     master_image_dir = os.path.dirname(current_image_dir) # Folder of all images is one layer above any given image folder
     list_of_image_dirs = os.listdir(master_image_dir) # List all image folders
+    
     try:
         current_index = list_of_image_dirs.index(current_image_dir_name) # Pull the index of the current image folder in its directory
     except:
@@ -133,7 +134,7 @@ def transition_path(config,script_dir):
     try:
         while True:
             # Begin indefinite loop
-            # If there is another entry afterward
+           
             next_image_dir_name = list_of_image_dirs[current_index+1] # Get the name of the next directory
             next_image_dir = os.path.join(master_image_dir,next_image_dir_name) # Get the path to the next directory
 
@@ -161,5 +162,5 @@ def transition_path(config,script_dir):
     with io.open(os.path.join(script_dir,"filePath.txt"),'w',encoding='utf-8') as file: # Open the file
         file.write(next_image_path)
 
-    # Reutrn that there is more content in the folder
+    # Return that there is more content in the folder
     return False
